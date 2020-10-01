@@ -1,0 +1,22 @@
+#board {
+    display: grid;
+    grid-template: repeat(3, 1fr)/repeat(3, 1fr);
+    width: 400px;
+    height: 400px;
+}
+
+.cell {
+    border: solid;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 50px;
+}
+
+#game-message {
+    font-size: 50px;
+}
+
+#new-game-button {
+    /*  */
+}
