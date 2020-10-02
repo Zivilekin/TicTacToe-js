@@ -1,13 +1,16 @@
 class Game {
     board = [];
     isXTurn = true;
+    boardSize = 5;
 
     gameMessage;
     newGameButton;
+    boardElement;
 
     constructor() {
         this.gameMessage = document.getElementById('game-message');
         this.newGameButton = document.getElementById('new-game-button');
+        this.boardElement = document.getElementById('board');
 
         this.resetBoard();
         this.createVisualBoard();
@@ -17,7 +20,7 @@ class Game {
     }
 
     handlePlayerMove() {
-        document.querySelector('#board').addEventListener('click', (e) => {
+        this.boardElement.addEventListener('click', (e) => {
             let cellId = e.target.getAttribute('id');
             let position = cellId.split('_');
 
@@ -29,17 +32,19 @@ class Game {
     handleNewGameClick() {
         this.newGameButton.addEventListener('click', () => {
             this.resetGame();
-        })
+        });
     }
 
     createVisualBoard() {
-        for(let i=0; i<3; i++) {
-            for(let j=0; j<3; j++) {
-                let cell = document.getElementById('board').appendChild(document.createElement('div'));
+        for(let i=0; i<this.boardSize; i++) {
+            for(let j=0; j<this.boardSize; j++) {
+                let cell = this.boardElement.appendChild(document.createElement('div'));
                 cell.setAttribute('class', 'cell');
                 cell.setAttribute('id', `${i}_${j}`);
             }
         }
+
+        this.boardElement.style.gridTemplate = `repeat(${this.boardSize}, 1fr)/repeat(${this.boardSize}, 1fr)`;
     }
 
     addVisualCell(elementId) {
@@ -62,13 +67,13 @@ class Game {
     }
 
     printBoard() {
-        for(let i=0; i<3; i++){
+        for(let i=0; i<this.boardSize; i++){
             console.log(this.board[i]);
         }
     }
 
     checkIfSomeoneWon() {
-        for(let i=0; i<3; i++) {
+        for(let i=0; i<this.boardSize; i++) {
             if (this.checkHorizontal(i) || this.checkVertical(i)){
                 this.isXTurn ? this.gameMessage.innerHTML = 'X is winner!' : this.gameMessage.innerHTML = 'O is winner!';
             }
@@ -76,23 +81,42 @@ class Game {
     }
 
     checkHorizontal(lineIndex) {
-        return this.board[lineIndex][0] && 
-            this.board[lineIndex][0] === this.board[lineIndex][1] && this.board[lineIndex][0] === this.board[lineIndex][2];
+        let boolVal = this.board[lineIndex][0];
+
+        for(let i=1; i<this.boardSize; i++) {
+            boolVal &&= this.board[lineIndex][0] === this.board[lineIndex][i];
+        }
+
+        return boolVal;
+
+        // return this.board[lineIndex][0] && 
+        //     this.board[lineIndex][0] === this.board[lineIndex][1] && this.board[lineIndex][0] === this.board[lineIndex][2];
     }
 
     checkVertical(columnIndex) {
-        return this.board[0][columnIndex] && 
-            this.board[0][columnIndex] === this.board[1][columnIndex] && this.board[0][columnIndex] === this.board[2][columnIndex];
+        let boolVal = this.board[0][columnIndex];
+
+        for(let i=1; i<this.boardSize; i++) {
+            boolVal &&= this.board[0][columnIndex] === this.board[i][columnIndex];
+        }
+
+        return boolVal;
+
+        // return this.board[0][columnIndex] && 
+        //     this.board[0][columnIndex] === this.board[1][columnIndex] && this.board[0][columnIndex] === this.board[2][columnIndex];
     }
 
     resetBoard() {
-        for(let i=0; i<3; i++) {
-            this.board[i] = ['','',''];
+        for(let i=0; i<this.boardSize; i++) {
+            this.board[i] = [];
+            for(let j=0; j<this.boardSize; j++) {
+                this.board[i][j] = '';
+            }
         }
     }
 
     resetVisualBoard() {
-        document.getElementById('board').childNodes.forEach((node) => node.innerHTML = '');
+        this.boardElement.childNodes.forEach((node) => node.innerHTML = '');
 
     }
 
