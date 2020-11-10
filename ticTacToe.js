@@ -1,22 +1,38 @@
-class Game {
-    board = [];
-    isXTurn = true;
-    boardSize = 5;
+class WebUIHandler {
 
     gameMessage;
     newGameButton;
     boardElement;
-
+ 
     constructor() {
         this.gameMessage = document.getElementById('game-message');
         this.newGameButton = document.getElementById('new-game-button');
         this.boardElement = document.getElementById('board');
 
-        this.resetBoard();
-        this.createVisualBoard();
+        this.initializeBoard();
 
         this.handlePlayerMove();
         this.handleNewGameClick();
+    }
+
+    initializeBoard(boardSize) {
+        for(let i=0; i<boardSize; i++) {
+            for(let j=0; j<boardSize; j++) {
+                let cell = this.boardElement.appendChild(document.createElement('div'));
+                cell.setAttribute('class', 'cell');
+                cell.setAttribute('id', `${i}_${j}`);
+            }
+        }
+
+        this.boardElement.style.gridTemplate = `repeat(${boardSize}, 1fr)/repeat(${boardSize}, 1fr)`;
+    }
+
+    addVisualCell(elementId) {
+        if(this.isXTurn) {
+            document.getElementById(elementId).innerHTML = 'X';
+        } else {
+            document.getElementById(elementId).innerHTML = 'O';
+        }
     }
 
     handlePlayerMove() {
@@ -35,24 +51,27 @@ class Game {
         });
     }
 
-    createVisualBoard() {
-        for(let i=0; i<this.boardSize; i++) {
-            for(let j=0; j<this.boardSize; j++) {
-                let cell = this.boardElement.appendChild(document.createElement('div'));
-                cell.setAttribute('class', 'cell');
-                cell.setAttribute('id', `${i}_${j}`);
-            }
-        }
+    resetVisualBoard() {
+        this.boardElement.childNodes.forEach((node) => node.innerHTML = '');
 
-        this.boardElement.style.gridTemplate = `repeat(${this.boardSize}, 1fr)/repeat(${this.boardSize}, 1fr)`;
     }
 
-    addVisualCell(elementId) {
-        if(this.isXTurn) {
-            document.getElementById(elementId).innerHTML = 'X';
-        } else {
-            document.getElementById(elementId).innerHTML = 'O';
-        }
+    resetGameText() {
+        this.gameMessage.innerHTML = '';
+    }
+}
+
+class Game {
+    board = [];
+    isXTurn = true;
+    boardSize = 3;
+
+    constructor(uiHandler) {
+        this.uiHandler = uiHandler;
+
+        this.uiHandler.initializeBoard(this.boardSize);
+
+        this.resetBoard();
     }
 
     makeMove(x,y) {
@@ -63,14 +82,14 @@ class Game {
         }
         this.checkIfSomeoneWon();
         this.isXTurn = !this.isXTurn;
-        this.printBoard();
+        // this.printBoard();
     }
 
     printBoard() {
         for(let i=0; i<this.boardSize; i++){
             console.log(this.board[i]);
         }
-    }
+    }//
 
     checkIfSomeoneWon() {
         for(let i=0; i<this.boardSize; i++) {
@@ -84,26 +103,20 @@ class Game {
         let boolVal = this.board[lineIndex][0];
 
         for(let i=1; i<this.boardSize; i++) {
-            boolVal &&= this.board[lineIndex][0] === this.board[lineIndex][i];
+            boolVal = boolVal && this.board[lineIndex][0] === this.board[lineIndex][i];
         }
 
         return boolVal;
-
-        // return this.board[lineIndex][0] && 
-        //     this.board[lineIndex][0] === this.board[lineIndex][1] && this.board[lineIndex][0] === this.board[lineIndex][2];
     }
 
     checkVertical(columnIndex) {
         let boolVal = this.board[0][columnIndex];
 
         for(let i=1; i<this.boardSize; i++) {
-            boolVal &&= this.board[0][columnIndex] === this.board[i][columnIndex];
+            boolVal = boolVal && this.board[0][columnIndex] === this.board[i][columnIndex];
         }
 
         return boolVal;
-
-        // return this.board[0][columnIndex] && 
-        //     this.board[0][columnIndex] === this.board[1][columnIndex] && this.board[0][columnIndex] === this.board[2][columnIndex];
     }
 
     resetBoard() {
@@ -115,21 +128,20 @@ class Game {
         }
     }
 
-    resetVisualBoard() {
-        this.boardElement.childNodes.forEach((node) => node.innerHTML = '');
-
-    }
-
-    resetGameText() {
-        this.gameMessage.innerHTML = '';
-    }
-
     resetGame() {
         this.resetBoard();
-        this.resetVisualBoard();
-        this.resetGameText();
     }
 
 }
 
-let game = new Game();
+// let game = new Game();
+// game.makeMove(1,1);
+// game.makeMove(1,2);
+// game.makeMove(2,1);
+// game.printBoard();
+
+let game = new Game(new WebUIHandler());
+game.makeMove(1,1);
+game.makeMove(1,2);
+game.makeMove(2,1);
+game.printBoard();
